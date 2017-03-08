@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.concurrent.Callable;
 
 /** Helper class for creating and working with OkHttp in Rx style.
  *
@@ -120,5 +121,24 @@ public class RxOkHttp {
 				}
 			}
 		};
+	}
+
+	private static class RequestCallable implements Callable<Response> {
+		private final OkHttpClient mClient;
+		private final Request      mRequest;
+
+		public RequestCallable(OkHttpClient client,
+							   Request request) {
+			mClient = client;
+			mRequest = request;
+		}
+
+		@Override
+		public Response call()
+		  throws
+		  Exception {
+			return mClient.newCall(mRequest)
+						  .execute();
+		}
 	}
 }
