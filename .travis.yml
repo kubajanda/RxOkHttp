@@ -19,3 +19,5 @@ android:
 #    - sys-img-armeabi-v7a-android-17
   licenses:
     - 'android-sdk-license-.+'
+script:
+  - ./gradlew build
