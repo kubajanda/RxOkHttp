@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		RxOkHttp.get("http://www.kubajanda.cz/mysongbook/beta/search?query=nohavica")
+		RxOkHttp.get("http://headers.jsontest.com/")
 				.map(RxOkHttp.asJSONObject())
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread()).subscribe(new SingleObserver<JSONObject>(){

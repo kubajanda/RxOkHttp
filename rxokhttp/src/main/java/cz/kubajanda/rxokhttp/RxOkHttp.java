@@ -96,8 +96,10 @@ public class RxOkHttp {
 			@Override
 			public String apply(Response response) {
 				try {
-					return response.body()
-								   .string();
+					final String data = response.body()
+												.string();
+					response.close();
+					return data;
 				} catch (IOException e) {
 					throw Exceptions.propagate(e);
 				}
@@ -114,8 +116,10 @@ public class RxOkHttp {
 			@Override
 			public JSONObject apply(Response response) {
 				try {
-					return new JSONObject(response.body()
-												  .string());
+					final JSONObject jsonObject = new JSONObject(response.body()
+																		 .string());
+					response.close();
+					return jsonObject;
 				} catch (IOException | JSONException e) {
 					throw Exceptions.propagate(e);
 				}
