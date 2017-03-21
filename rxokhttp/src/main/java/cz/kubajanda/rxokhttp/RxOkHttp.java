@@ -1,8 +1,12 @@
 package cz.kubajanda.rxokhttp;
 
 import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
 import io.reactivex.exceptions.Exceptions;
+import io.reactivex.functions.Cancellable;
 import io.reactivex.functions.Function;
+import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -10,7 +14,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.concurrent.Callable;
 
 /** Helper class for creating and working with OkHttp in Rx style.
  *
@@ -59,7 +62,7 @@ public class RxOkHttp {
 	 */
 	public static Single<Response> from(final OkHttpClient client,
 										final Request request) {
-		return Single.fromCallable(new RequestCallable(client, request));
+		return Single.create(new ResponseOnSubscribe(client, request));
 	}
 
 	/** Creates Response observable by getting specified url.
@@ -127,22 +130,36 @@ public class RxOkHttp {
 		};
 	}
 
-	private static class RequestCallable implements Callable<Response> {
+	private static class ResponseOnSubscribe implements SingleOnSubscribe<Response>, Cancellable {
 		private final OkHttpClient mClient;
 		private final Request      mRequest;
+		private       Call         mCall;
 
-		public RequestCallable(OkHttpClient client,
-							   Request request) {
+		private ResponseOnSubscribe(OkHttpClient client,
+									Request request) {
 			mClient = client;
 			mRequest = request;
 		}
 
 		@Override
-		public Response call()
+		public void subscribe(SingleEmitter<Response> e)
 		  throws
 		  Exception {
-			return mClient.newCall(mRequest)
-						  .execute();
+			e.setCancellable(this);
+
+			if (!e.isDisposed()) {
+				mCall = mClient.newCall(mRequest);
+				e.onSuccess(mCall.execute());
+			}
+		}
+
+		@Override
+		public void cancel()
+		  throws
+		  Exception {
+			if (mCall != null) {
+				mCall.cancel();
+			}
 		}
 	}
 }
