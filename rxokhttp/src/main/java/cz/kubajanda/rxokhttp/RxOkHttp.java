@@ -149,7 +149,11 @@ public class RxOkHttp {
 
 			if (!e.isDisposed()) {
 				mCall = mClient.newCall(mRequest);
-				e.onSuccess(mCall.execute());
+				final Response response = mCall.execute();
+
+				if (!e.isDisposed()) {
+					e.onSuccess(response);
+				}
 			}
 		}
 
