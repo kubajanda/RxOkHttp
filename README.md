@@ -14,7 +14,8 @@ The simplest example coudle be something like this:
 RxOkHttp.get("http://headers.jsontest.com/")
         .map(RxOkHttp.asJSONObject())
         .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread()).subscribe(new SingleObserver<JSONObject>(){
+        .observeOn(AndroidSchedulers.mainThread())
+		.subscribe(new SingleObserver<JSONObject>(){
 
     @Override
     public void onSubscribe(Disposable d) {
